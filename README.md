@@ -1,2 +1,3 @@
-# UW_JSCRIPT330_Back-End_Application_Development_With_Javascript
-3️⃣ My school assignments from the third course in the University of Washington's "Full-Stack Development With JavaScript" certificate program
+# _Back-End Application Development With Javascript_
+
+Below are my school assignments from the 2025 Spring quarter of the University of Washington's ["Full-Stack Development With JavaScript" certification program](https://www.pce.uw.edu/certificates/full-stack-development-with-javascript) :
