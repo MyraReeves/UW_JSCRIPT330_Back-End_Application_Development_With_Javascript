@@ -12,7 +12,7 @@ At the end of this week, a student should:
 
 ## The assignment
 
-The assignment this week is designed to get you comfortable working in an Express server. It is not meant to be particularly challening, but simply to get you aquainted with a project of the type we will be working in during this course. It contains a simple set of REST endpoints for a generic data type (`items`). You will complete this REST API.
+The assignment this week is designed to get you comfortable working in an Express server. It is not meant to be particularly challenging, but simply to get you aquainted with a project of the type we will be working in during this course. It contains a simple set of REST endpoints for a generic data type (`items`). You will complete this REST API.
 
 ### Getting started
 
