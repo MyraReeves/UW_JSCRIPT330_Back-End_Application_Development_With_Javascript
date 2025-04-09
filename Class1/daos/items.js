@@ -24,11 +24,20 @@ module.exports.getById = (itemId) => {
 }
 
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Delete an item from the itemsModel array based on its id, using the findIndex() method and the splice() method: //
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.deleteById = async (itemId) => {
-    // TODO: complete
-}
 
+   // Find the index of the item using the given id:
+  const itemIndex = itemsModel.items.findIndex(item => item.id === itemId);
+
+  // If that index exists in the array, remove the item and then return the array without it:
+  if (itemIndex >= 0){
+    itemsModel.items.splice(itemIndex, 1);
+    return itemsModel.items;
+  }
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
