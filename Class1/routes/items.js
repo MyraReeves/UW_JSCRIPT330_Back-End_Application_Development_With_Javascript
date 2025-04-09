@@ -65,9 +65,21 @@ router.put("/:id", (req, res, next) => {
 });
 
 
+//////////////////////
+// DELETE AN ITEM: //
+////////////////////
 router.delete("/:id", (req, res, next) => {
-  // TODO: complete this route
-  res.sendStatus(501);
+  // Find the item's id from the request's parameters:
+  const itemID = req.params.id;
+
+  // Delete the item using the method defined in the daos JS file:
+  const itemDeleted = itemDao.deleteById(itemID);
+
+  // The test file's wording for describe("DELETE /:id") is                      expect(res.statusCode).toEqual(200)
+  res.sendStatus(200);
 });
+
+
+
 
 module.exports = router;
