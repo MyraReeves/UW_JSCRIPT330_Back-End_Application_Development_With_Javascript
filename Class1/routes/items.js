@@ -11,7 +11,7 @@ router.use(bodyParser.json());
 // GET ALL ITEMS: //
 ///////////////////
 router.get("/", (req, res, next) => {
-  res.json(itemDao.getAll());
+  res.json(itemDao.getAll());                           // getAll() is defined in the daos JS file
 });
 
 
@@ -45,16 +45,25 @@ router.get("/:id", (req, res, next) => {
 // CREATE A NEW ITEM: //
 ///////////////////////
 router.post("/", (req, res, next) => {
-  itemDao.create(req.body);
+  itemDao.create(req.body);                           // create() is defined in the daos JS file
   res.sendStatus(200);
 });
 
 
-
+//////////////////////
+// UPDATE AN ITEM: //
+////////////////////
 router.put("/:id", (req, res, next) => {
-  // TODO: complete this route
-  res.sendStatus(501);
+  // Find an item's id from the request's parameters:
+  const itemId = req.params.id;
+
+  // Update the item by id using the method defined in the daos JS file:
+  const updatedItem = itemDao.updateById(itemId, req.body);
+
+  // Set the status to 200, since all 3 PUT tests say                           expect(res.statusCode).toEqual(200);
+  res.sendStatus(200);
 });
+
 
 router.delete("/:id", (req, res, next) => {
   // TODO: complete this route
