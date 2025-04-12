@@ -8,4 +8,3 @@ mongoose.connect('mongodb://localhost/jscript-330-week-2', {}).then(() => {
    console.log(`Server is listening on http://localhost:${port}`);
   });
 });
-
