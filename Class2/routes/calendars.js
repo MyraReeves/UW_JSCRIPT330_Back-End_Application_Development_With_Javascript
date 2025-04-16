@@ -3,22 +3,26 @@ const CalendarDAO = require('../daos/calendars');
 const router = Router();
 
 
-// Create:
+// CREATE:
 router.post("/", async (req, res, next) => {
   try {
-    const {name} = req.body;    //  Checks for the presence of "name" inside the POST request body. See calendarSchema inside the models file
+    const {name} = req.body;    //  Checks for the presence of "name" inside the POST request body. See calendarSchema inside the models file for the mongoose schema
+
     if (!name) {
       return res.sendStatus(400);   // If "name" doesn't exist inside the request body, returns a 400 error code
     }
-    const calendar = await CalendarDAO.create({ name });    // Creates a new calendar if name is provided
-    res.sendStatus(200).send(calendar);
-  } catch (e) {
+
+    const calendar = await CalendarDAO.create({ name });
+    res.sendStatus(200).send(calendar);     // Creates a new calendar with the name object inside
+  } 
+  catch (e) {
     next(e);
   }
 });
 
 
-// Read:
+
+// READ:
 router.get("/", async (req, res, next) => {
   try {
     const calendars = await CalendarDAO.getAll();
@@ -42,22 +46,31 @@ router.get("/:id", async (req, res, next) => {
 });
 
 
-// Update:
+
+// UPDATE:
 router.put("/:id", async (req, res, next) => {
   try {
-    const calendar = await CalendarDAO.updateById(req.params.id);
-    if (calendar) {
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(404);
+    const {name} = req.body;    //  Checks for the presence of "name" inside the request body. See calendarSchema inside the models file for the mongoose schema with { type: String, required: true }
+
+    if (!name) {
+      return res.sendStatus(400);   // If the "name" object doesn't exist inside the request body, return a 400 error code
     }
-  } catch(e) {
+
+    const calendar = await CalendarDAO.updateById(req.params.id, { name });   // Send the id and the new name within the update request
+
+    if (!calendar) {
+      return res.sendStatus(404);     // Return a 404 error if there is no matching id [See first part of calendar PUT test]
+    }
+
+    res.status(200).send(calendar);   // Update the calendar document
+  } catch (e) {
     next(e);
   }
 });
 
 
-// Delete:
+
+// DELETE:
 router.delete("/:id", async (req, res, next) => {
   try {
     const calendar = await CalendarDAO.removeById(req.params.id);
