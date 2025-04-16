@@ -6,14 +6,13 @@ const router = Router();
 // Create:
 router.post("/", async (req, res, next) => {
   try {
-    const calendar = await CalendarDAO.create(req.params.id);
-    if (calendar) {
-      res.sendStatus(200);
-    } else {
-      res.sendStatus(404);
+    const {name} = req.body;    //  Checks for the presence of "name" inside the POST request body. See calendarSchema inside the models file
+    if (!name) {
+      return res.sendStatus(400);   // If "name" doesn't exist inside the request body, returns a 400 error code
     }
-  }
-  catch (e) {
+    const calendar = await CalendarDAO.create({ name });    // Creates a new calendar if name is provided
+    res.sendStatus(200).send(calendar);
+  } catch (e) {
     next(e);
   }
 });
