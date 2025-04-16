@@ -12,7 +12,8 @@ module.exports.create = async (name) => {
 // This READS/GETS a single calendar from the database:
 module.exports.getById = async (id) => {
   try {
-    const calendar = await Calendars.findOne({ _id: id }).lean();                 // Utilize the lean() method after find() to retrieve data as plain JavaScript objects instead of full-fledged Mongoose documents. This bypasses Mongoose's data processing overhead, resulting in faster queries.
+    const calendar = await Calendars.findOne({ _id: id }).lean();                 
+    // Quote from the internet:  "Utilize the lean() method after find() to retrieve data as plain JavaScript objects instead of full-fledged Mongoose documents. This bypasses Mongoose's data processing overhead, resulting in faster queries."
     return calendar;
   } catch (e) {
     return null;
