@@ -4,7 +4,7 @@ module.exports = {};
 
 // This CREATES/POSTS a calendar document in the database:
 module.exports.create = async (name) => {
-  return await Calendars.create({ name });
+  return await Calendars.create({ name: 'new' });           // Includes an object with a value of "new" for key "name" inside the newly created calendar document [See the second half of the POST test for this requirement]
 };
 
 
