@@ -67,16 +67,25 @@ module.exports.getById = (bookId) => {
 
 
 
-////////////////////////////////////////////////////////
-// UPDATES a book inside the database, using its id: //
-//////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// UPDATES a book with new values, using its id to locate and update it: //
+//////////////////////////////////////////////////////////////////////////
 module.exports.updateById = async (bookId, newObj) => {
+
+  // Returns "false" if the bookId is not a proper MongoDB ObjectId:
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return false;
   }
-  await Book.updateOne({ _id: bookId }, newObj);
-  return true;
+
+  // Looks for a book with a matching _id and applies the newObj values to it:
+  const result = await Book.updateOne(
+    { _id: bookId }, newObj, { runValidators: true }              // The addition of {runValidators: true} ensures that any new fields still follow the schema.
+  );
+
+  // Return "true" if the book was successfully modified (ie. count is greater than zero), or "false" if the book was not found or some other issue resulted in failure to modify:
+  return result.modifiedCount > 0;
 }
+
 
 
 ////////////////////////////////////////////////
