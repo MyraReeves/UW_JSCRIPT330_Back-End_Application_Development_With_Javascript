@@ -25,6 +25,7 @@ class BadDataError extends Error {};
 module.exports.BadDataError = BadDataError;
 
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // READS/GETS all books inside the database (either global results or author-specific ones): //
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,20 +43,28 @@ module.exports.getAll = ({ authorId, page, perPage }) => {
   // Return all books for an author if authorId is provided **OR** return all books in the db if no authorId is provided (filter remains an empty object if no authorId was provided):
   return Book.find(filter).limit(perPage).skip(perPage * page).lean();
 }
-// EXPLANATION OF PRE-EXISTING CODE PROVIDED:       limit(perPage) restricts the number of results
-// EXPLANATION OF PRE-EXISTING CODE PROVIDED:       skip(perPage * page) paginates the results. Page 0 is the first page
-// EXPLANATION OF PRE-EXISTING CODE PROVIDED:       .lean() returns plain JS objects instead of full Mongoose documents
+/* EXPLANATION OF THE PRE-EXISTING CODE PROVIDED:       
+.limit(perPage)             restricts the number of results
+.skip(perPage * page)       paginates the results. Page 0 is the first page
+.lean()                     returns plain JS objects instead of full Mongoose documents
+*/
+
 
 
 ///////////////////////////////////////////////////////////////////
 // READS/GETS the information about a SINGLE book using its id: //
 /////////////////////////////////////////////////////////////////
 module.exports.getById = (bookId) => {
+
+  // Return "null" if the bookId is not a valid ObjectId:
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return null;
   }
-  return Book.findOne({ _id: bookId }).lean();
+
+  // Return the single book that has the matching id:
+  return Book.findOne({ _id: bookId }).lean();          // .lean() converts the Mongoose document into a plain JavaScript object
 }
+
 
 
 ////////////////////////////////////////////////////////
