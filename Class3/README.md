@@ -8,7 +8,7 @@ At the end of this week, a student should:
 
 - be comfortable using MongoDB for more than simple CRUD operations
 - be able to use indexes for performance and uniqueness
-- have implemented text search, aggregation, indexes, and lookups 
+- have implemented text search, aggregation, indexes, and lookups
 
 ## The assignment
 
