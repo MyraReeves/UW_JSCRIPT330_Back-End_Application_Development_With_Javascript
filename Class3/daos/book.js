@@ -67,6 +67,28 @@ module.exports.getById = (bookId) => {
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// READ/GETS books using the text index fields defined in the model file (title, genre, blurb): //
+/////////////////////////////////////////////////////////////////////////////////////////////////
+module.exports.search = async (searchQuery) => {        // In the unit tests, the value of searchQuery is "Harlem", "Fantasy and Kings", or "Superhero"
+
+  // If no search term is provided, return an empty array:
+  if (!searchQuery) return [];
+
+  return Book.find(
+    //  Search using the provided search term:
+    { $text: { $search: searchQuery } },
+
+    // Rank how relevant the resulting book is to the search terms that were provided:
+    { score: { $meta: "textScore" } }
+  )
+  // According to the test file, the returned results should then be "sorted by best matching single term." So sort by the textScore, in descending order (most relevant first):
+  .sort({ score: { $meta: "textScore" } }).lean();
+
+};
+
+
+
 ////////////////////////////////////////////////////////////////////////////
 // UPDATES a book with new values, using its id to locate and update it: //
 //////////////////////////////////////////////////////////////////////////
