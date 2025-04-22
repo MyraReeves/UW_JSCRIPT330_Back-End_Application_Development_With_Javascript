@@ -16,6 +16,7 @@ module.exports.create = async (bookData) => {
     if (e.message.includes('validation failed')) {
       throw new BadDataError(e.message);
     }
+    // Otherwise, throw the default error message for all other failures:
     throw e;
   }
 }
@@ -24,20 +25,31 @@ class BadDataError extends Error {};
 module.exports.BadDataError = BadDataError;
 
 
-/////////////////////////////////////////////////////////
-// READS/GETS all the info inside the books database: //
-///////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+// READS/GETS all books inside the database (either global results or author-specific ones): //
+//////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.getAll = ({ authorId, page, perPage }) => {
-  // Return all books using the author id:
+
+  // Create an empty object query filter so that it can be used in the Book.find(filter) return statement to control whether what gets returned is author-specific or not:
   const filter = {};
+  
+  // Check whether an authorId was provided and whether it is a valid MongoDB ObjectId:
   if (authorId && mongoose.Types.ObjectId.isValid(authorId)) {
+    // Change the value of the filter object to { authorId: authorId } :
     filter.authorId = authorId;
   }
-  // Return all books using page and perPage:
+
+  // Return all books for an author if authorId is provided **OR** return all books in the db if no authorId is provided (filter remains an empty object if no authorId was provided):
   return Book.find(filter).limit(perPage).skip(perPage * page).lean();
 }
+// EXPLANATION OF PRE-EXISTING CODE PROVIDED:       limit(perPage) restricts the number of results
+// EXPLANATION OF PRE-EXISTING CODE PROVIDED:       skip(perPage * page) paginates the results. Page 0 is the first page
+// EXPLANATION OF PRE-EXISTING CODE PROVIDED:       .lean() returns plain JS objects instead of full Mongoose documents
 
-// READS/GETS the information about a SINGLE book:
+
+///////////////////////////////////////////////////////////////////
+// READS/GETS the information about a SINGLE book using its id: //
+/////////////////////////////////////////////////////////////////
 module.exports.getById = (bookId) => {
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return null;
