@@ -72,17 +72,18 @@ module.exports.getById = (bookId) => {
 //////////////////////////////////////////////////////////////////////////
 module.exports.updateById = async (bookId, newObj) => {
 
-  // Returns "false" if the bookId is not a proper MongoDB ObjectId:
+  // Return "false" if the bookId is not a proper MongoDB ObjectId:
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return false;
   }
 
-  // Looks for a book with a matching _id and applies the newObj values to it:
+  // Look for a book with a matching _id and apply the newObj values to it.  Store the result in a variable:
   const result = await Book.updateOne(
-    { _id: bookId }, newObj, { runValidators: true }              // The addition of {runValidators: true} ensures that any new fields still follow the schema.
+    { _id: bookId }, newObj, { runValidators: true }              
+    // Note:  The addition of {runValidators: true} ensures that any new fields still follow the schema.
   );
 
-  // Return "true" if the book was successfully modified (ie. count is greater than zero), or "false" if the book was not found or some other issue resulted in failure to modify:
+  // Using the newly created variable, return "true" if the book was successfully modified (ie. count is 1), or "false" if the book was not found or some other issue resulted in failure to modify (ie. count is 0):
   return result.modifiedCount > 0;
 }
 
@@ -92,9 +93,15 @@ module.exports.updateById = async (bookId, newObj) => {
 // DELETES a book listing from the database: //
 //////////////////////////////////////////////
 module.exports.deleteById = async (bookId) => {
+
+  // Prevent a database error from occurring, by returning "false" if the book id is not a valid MongoDB ObjectId:
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return false;
   }
-  await Book.deleteOne({ _id: bookId });
-  return true;
+
+  // Use a variable to store the result of deleting the one book whose _id matches bookId:
+  const result = await Book.deleteOne({ _id: bookId });
+
+  //  .deletedCount tells you how many documents were deleted. The count should be 0 if none or 1 if the book was successfully deleted.  Use that to return "true" if a document was successfully deleted or "false" if it wasn't.
+  return result.deletedCount > 0;
 }
