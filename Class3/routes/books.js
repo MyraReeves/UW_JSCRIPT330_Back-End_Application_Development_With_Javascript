@@ -111,6 +111,32 @@ router.get("/:id", async (req, res, next) => {
 });
 
 
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// READ the data based on author stats in order to
+// "return stats grouped by authorId with sorted titles" and "return stats by authorId with all author info"
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+router.get("/authors/stats", async (req, res, next) => {
+  try {
+    // If present, save the authorInfo value from the query string that's in the URL:
+    const { authorInfo } = req.query;
+    // The URL will either be "/books/authors/stats?authorInfo=true" or simply "/books/authors/stats" (which is false)
+
+    // Use that variable to pass a boolean value into the DAO, so that it knows which pipeline to use:
+    const stats = await bookDAO.getStatsByAuthor(authorInfo === 'true');
+    // This compares the string to "true".  So if "?authorInfo=true" is present, "true" will be passed into the DAO.  Otherwise, "false" will be passed in.
+
+    // Return the result in JSON form alongside a 200 code:
+    res.status(200).json(stats);
+  }
+  // In case of any errors, send a 500 error message: 
+  catch (e) {
+    res.status(500).send(e.message);
+  }
+});
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 // UPDATE a book's data using its id -- This handles PUT requests such as "/books/10229" //
 //////////////////////////////////////////////////////////////////////////////////////////
