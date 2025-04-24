@@ -4,7 +4,7 @@ module.exports = {};
 
 
 ////////////////////////////////////////////////////
-// CREATES a new book entry inside the database: //
+// CREATE a new book entry inside the database: //
 //////////////////////////////////////////////////
 module.exports.create = async (bookData) => {
   try {
@@ -27,7 +27,7 @@ module.exports.BadDataError = BadDataError;
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// READS/GETS all books inside the database (either global results or author-specific ones): //
+// READ/GET all books inside the database (either global results or author-specific ones): //
 //////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.getAll = ({ authorId, page, perPage }) => {
 
@@ -52,7 +52,7 @@ module.exports.getAll = ({ authorId, page, perPage }) => {
 
 
 ///////////////////////////////////////////////////////////////////
-// READS/GETS the information about a SINGLE book using its id: //
+// READ/GET the information about a SINGLE book using its id: //
 /////////////////////////////////////////////////////////////////
 module.exports.getById = (bookId) => {
 
@@ -68,7 +68,7 @@ module.exports.getById = (bookId) => {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// READ/GETS books using the text index fields defined in the model file (title, genre, blurb): //
+// READ/GET books using the text index fields defined in the model file (title, genre, blurb): //
 /////////////////////////////////////////////////////////////////////////////////////////////////
 module.exports.search = async (searchQuery) => {        // In the unit tests, the value of searchQuery is "Harlem", "Fantasy and Kings", or "Superhero"
 
@@ -88,25 +88,76 @@ module.exports.search = async (searchQuery) => {        // In the unit tests, th
 };
 
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// READ/GET each book using its authorId,                                                //
+// group with each author's books sorted by title                                       //
+// Include all the author's details if requested                                       //
+////////////////////////////////////////////////////////////////////////////////////////
+
+// Set the value of "includeAuthorInfo" to be false by default:
+module.exports.getStatsByAuthor = async (includeAuthorInfo = false) => {
+
+  // Set up a MongoDB aggregation pipeline (this will be "an array of stages that transform the data step by step"):
+  const pipeline = [
+    {
+      // Group all books by their authorId:
+      $group: {
+        _id: "$authorId",
+        titles: { $push: "$title" },              // Collects all the book titles for an author into an array
+        pageCounts: { $push: "$pageCount" }       // Collects all the page counts for the author’s books into an array
+      }
+    },
+    {
+      // Reshape the data for each author group: 
+      $project: {
+        authorId: "$_id",
+        titles: { $sortArray: { input: "$titles", sortBy: 1 } },    // Sorts the array of book titles
+        averagePageCount: { $avg: "$pageCounts" },                  // Calculates the average of values in the pageCounts array
+        numBooks: { $size: "$titles" },                     // Uses the length of the titles array to calculate the number of books
+        _id: 0                                                      // Omits the default MongoDB _id field from output
+      }
+    }
+  ];
+
+  //  If the URL is "/books/authors/stats?authorInfo=true"...
+  if (includeAuthorInfo) {
+    // ...add the following additional steps to the aggregation pipeline:
+    pipeline.push(
+      {
+        // Use "lookup" (Quote from internet: "$lookup lets you pull in data from a different collection, matching based on a shared key between the two collections.")
+        $lookup: {
+          from: "authors",          // Pull from the collection of authors
+          localField: "authorId",   // Look at the value inside of authorId
+          foreignField: "_id",      // Match it against the _id field in the authors collection
+          as: "author"              // Store the result in an array named "author"
+        }
+      },
+      {
+        // Change the output so each result has a single embedded author object instead of an array:
+        $unwind: "$author"
+      }
+    );
+  }
+
+  return Book.aggregate(pipeline);
+};
+
+// Qutoe: "A pipeline refers specifically to the aggregation pipeline — a framework used to process data in multiple stages. Each stage transforms the data in some way (e.g., filtering, grouping, sorting), and the result of one stage is passed to the next — like an assembly line."
+
 
 ////////////////////////////////////////////////////////////////////////////
 // UPDATES a book with new values, using its id to locate and update it: //
 //////////////////////////////////////////////////////////////////////////
 module.exports.updateById = async (bookId, newObj) => {
 
-  // Return "false" if the bookId is not a proper MongoDB ObjectId:
+  // Returns "false" if the bookId is not a proper MongoDB ObjectId:
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     return false;
   }
 
-  // Look for a book with a matching _id and apply the newObj values to it.  Store the result in a variable:
-  const result = await Book.updateOne(
-    { _id: bookId }, newObj, { runValidators: true }              
-    // Note:  The addition of {runValidators: true} ensures that any new fields still follow the schema.
-  );
-
-  // Using the newly created variable, return "true" if the book was successfully modified (ie. count is 1), or "false" if the book was not found or some other issue resulted in failure to modify (ie. count is 0):
-  return result.modifiedCount > 0;
+  // Looks for a book with a matching _id and applies the newObj values to it, then returns "true":
+  await Book.updateOne({ _id: bookId }, newObj);
+  return true;
 }
 
 
@@ -121,9 +172,7 @@ module.exports.deleteById = async (bookId) => {
     return false;
   }
 
-  // Use a variable to store the result of deleting the one book whose _id matches bookId:
-  const result = await Book.deleteOne({ _id: bookId });
-
-  //  .deletedCount tells you how many documents were deleted. The count should be 0 if none or 1 if the book was successfully deleted.  Use that to return "true" if a document was successfully deleted or "false" if it wasn't.
-  return result.deletedCount > 0;
+  // Delete the book whose _id matches bookId:
+  await Book.deleteOne({ _id: bookId });
+  return true;
 }
