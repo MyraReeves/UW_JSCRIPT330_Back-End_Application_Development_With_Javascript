@@ -10,9 +10,16 @@ module.exports.create = async (bookData) => {
   try {
     const created = await Book.create(bookData);
     return created;
-  }
-  // Throw a BadDataError message upon validation failure: 
+  } 
   catch (e) {
+    // Reject a book with an existing ISBN:
+    // "e.code === 11000" catches a duplicate key error (11000 is a MongoDB-specific error code)
+    // "e.keyPattern.ISBN" confirms that the ISBN is the duplicated field
+    if (e.code === 11000 && e.keyPattern && e.keyPattern.ISBN) {
+      throw new BadDataError("ISBN must be unique.");
+    }
+
+    // Throw a BadDataError message upon validation failure:
     if (e.message.includes('validation failed')) {
       throw new BadDataError(e.message);
     }
