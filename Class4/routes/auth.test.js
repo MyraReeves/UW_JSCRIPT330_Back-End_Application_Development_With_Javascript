@@ -1,9 +1,8 @@
 const request = require("supertest");
-
 const server = require("../server");
 const testUtils = require("../test-utils");
+const User = require("../models/userModel");
 
-const User = require("../models/user");
 
 describe("/auth", () => {
   beforeAll(testUtils.connectDB);
