@@ -20,11 +20,15 @@
       "/node_modules/"
     ],
     "preset": "@shelf/jest-mongodb",
-    "watchPathIgnorePatterns": ["globalConfig"]
+    "watchPathIgnorePatterns": [
+      "globalConfig"
+    ]
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
-    "mongoose": "^8.13.2"
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.1"
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^5.1.0",
