@@ -4,7 +4,6 @@ const router = Router();
 const jwt = require('jsonwebtoken');
 const UserDAO = require('../DAOS/userDAO');
 const User = require('../models/userModel');
-const JWT_SECRET =  process.env.JWT_SECRET || 'secret';
 
 
 // Define Express middleware:
