@@ -1,10 +1,10 @@
 const express = require("express");
-
-const routes = require("./routes");
-
+const mongoose = require('mongoose');
+const authorizationRoutes = require("./routes/auth");
 const server = express();
+
 server.use(express.json());
 
-server.use(routes);
+server.use('/auth', authorizationRoutes);
 
 module.exports = server;
