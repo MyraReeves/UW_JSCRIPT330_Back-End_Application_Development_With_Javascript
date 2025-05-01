@@ -1,5 +1,6 @@
 const server = require("./server");
 const mongoose = require('mongoose');
+const routes = require('./routes/auth')
 
 const port = process.env.PORT || 3000;
 
