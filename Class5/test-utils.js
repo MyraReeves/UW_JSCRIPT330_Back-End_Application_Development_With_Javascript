@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const models = [
-  require("./models/item"),
-  require("./models/order"),
-  require("./models/user"),
+  require("./models/itemModel"),
+  require("./models/orderModel"),
+  require("./models/userModel"),
 ];
 
 module.exports = {};

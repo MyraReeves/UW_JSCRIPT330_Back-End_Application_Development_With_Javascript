@@ -1,11 +1,10 @@
 const request = require("supertest");
-
 const server = require("../server");
 const testUtils = require("../test-utils");
+const User = require("../models/userModel");
+const Item = require("../models/itemModel");
+const Order = require("../models/orderModel");
 
-const User = require("../models/user");
-const Item = require("../models/item");
-const Order = require("../models/order");
 
 describe("/order", () => {
   beforeAll(testUtils.connectDB);
