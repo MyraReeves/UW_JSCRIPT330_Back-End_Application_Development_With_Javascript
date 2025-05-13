@@ -3,6 +3,8 @@ const Order = require("../models/orderModel");
 const Item = require("../models/itemModel");
 const isAuthorized = require("../middleware/isAuthorized");
 const isAdmin = require("../middleware/isAdmin");
+const orderDao = require("../DAOS/orderDao");
+const itemDao = require("../DAOS/itemDao");
 const router = express.Router();
 
 
@@ -20,29 +22,28 @@ router.post("/", isAuthorized, async (req, res) => {
 
     // An order should be created with a `total` field with the total cost of all the items from the time the order is placed (as the item prices could change). The order should also have the `userId` of the user placing the order.
     try {
-        const foundItems = await Item.find({ _id: { $in: items } });
-        if (foundItems.length !== items.length) {
-            return res.status(400).json({ error: "One or more items do not exist" });
+        const foundItems = await itemDao.getAllItems();
+
+        // Calculate the total including any duplicate items:
+        const itemMap = Object.fromEntries(foundItems.map(
+            i => [i._id.toString(), i.price]
+        ));
+        let total = 0;
+        for (const id of items) {
+            // If a given item id doesn't exist, return an error:
+            if (!itemMap[id]){
+                return res.sendStatus(400);
+            }
+            // Otherwise, add the item to the running total:
+            total += itemMap[id];
         }
 
-        // Calculate total including duplicates:
-        const itemMap = foundItems.reduce((acc, item) => {
-            acc[item._id.toString()] = item.price;
-            return acc;
-        }, {});
-
-        let total = 0;
-        items.forEach((id) => {
-        total += itemMap[id];
-        });
-
-        const order = new Order({
+        const order = await orderDao.createOrder({
             userId: req.user._id,
             items,
             total,
         });
 
-        await order.save();
         res.status(201).json(order);
     }
 
@@ -63,7 +64,7 @@ router.get("/", isAuthorized, async (req, res) => {
     // If they are an admin user it should return all orders in the DB.
     try {
         const filter = req.user.roles.includes("admin") ? {} : { userId: req.user._id };
-        const orders = await Order.find(filter);
+        const orders = await orderDao.getOrders(filter);
         res.json(orders);
     }
 
@@ -81,7 +82,7 @@ router.get("/:id", isAuthorized, async (req, res) => {
 
     try {
         // Return an order with the `items` array containing the full item objects rather than just their \_id
-        const order = await Order.findById(req.params.id).populate("items");
+        const order = await orderDao.getOrderByIdPopulated(req.params.id);
 
         // If the order can't be found, return a 404 error:
         if (!order) return res.sendStatus(404);
@@ -105,6 +106,24 @@ router.get("/:id", isAuthorized, async (req, res) => {
     }
 });
 
+
+///////////////////////////////////
+// DELETE an order - Admin only //
+/////////////////////////////////
+router.delete("/:id", isAuthorized, isAdmin, async (req, res) => {
+    try {
+        const deleted = await orderDao.deleteOrder(req.params.id);
+
+        // If the order can't be found, return a 404 error:
+        if (!deleted) return res.sendStatus(404);
+
+        // Otherwise, return confirmation that the order was deleted:
+        res.json({ message: "Order deleted" });
+    } 
+    catch (err) {
+      res.sendStatus(500);
+    }
+  });
 
 
 module.exports = router;
