@@ -60,9 +60,9 @@ describe("/auth", () => {
         expect(res.statusCode).toEqual(400);
       });
 
-      it("should return 200 and with a password", async () => {
+      it("should return 201 Created when signing up with valid credentials such as having provided a password", async () => {
         const res = await request(server).post("/auth/signup").send(user1);
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
       });
 
       it("should return 409 Conflict with a repeat signup", async () => {
