@@ -3,7 +3,7 @@ const Item = require("../models/itemModel");
 const isAuthorized = require("../middleware/isAuthorized");
 const isAdmin = require("../middleware/isAdmin");
 const router = express.Router();
-const itemDao = require("../dao/itemDao");
+const itemDao = require("../DAOS/itemDao");
 
 
 /////////////////////////////////////////////////////////////////
