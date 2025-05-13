@@ -5,8 +5,8 @@ const mongoose = require("mongoose");
 // Define the schema for a user's account: //
 ////////////////////////////////////////////
 const userSchema = new mongoose.Schema({
-  // A password is required
-  password: { type: String, required: true },
+  // A password is required and it must have a minimum length of 8 characters:
+  password: { type: String, required: true, minlength: 8 },
 
   // Email is required, no duplicate emails are allowed, surrounding white space should be removed from the provided email, and all emails should be converted to all lowercase letter:
   email: { type: String, unique: true, required: true, trim: true, lowercase: true },
