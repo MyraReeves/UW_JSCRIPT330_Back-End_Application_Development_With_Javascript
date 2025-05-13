@@ -2,7 +2,9 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+const isAdmin = require("../middleware/isAdmin");
 const isAuthorized = require("../middleware/isAuthorized");
+const userDao = require("../DAOS/userDao");
 const router = express.Router();
 
 
@@ -14,7 +16,7 @@ router.post("/signup", async (req, res) => {
 
     try {
         const hashed = await bcrypt.hash(password, 10);
-        const user = new User({ email, password: hashed, roles });
+        const user = await userDao.createUser({ email, password: hashed, roles });
         await user.save();
         res.status(201).json({ message: "New user successfully created!" });
     }
@@ -31,15 +33,20 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     try {
+
+        // Find a user within the DB using their email address:
+        const user = await userDao.findUserByEmail(email);
+
         // Return an error if the user email address can't be found:
-        const user = await User.findOne({ email });
         if (!user) return res.sendStatus(401);
 
-        // Return an error if the password credentials don't match:
+        // Compare the entered password with the one saved in the DB for that user:
         const match = await bcrypt.compare(password, user.password);
+
+        // Return an error if the password credentials don't match:
         if (!match) return res.sendStatus(401);
 
-        // Otherwise, generate a JSON web token for the authenticated user:
+        // Otherwise, generate an encrypted JSON web token for the authenticated user:
         const token = jwt.sign(
             { _id: user._id, roles: user.roles },
             process.env.JWT_SECRET,
@@ -63,12 +70,16 @@ router.put("/password", isAuthorized, async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
     try {
+        // Find the user by their id:
+        const user = await userDao.findUserById(req.user._id);
+
         // Return an error if the user is not found:
-        const user = await User.findById(req.user._id);
         if (!user) return res.sendStatus(404);
 
-        // Return an error if the previous password that is entered does not match what's on file:
+        // Compare the entered password with the one saved inside the DB
         const match = await bcrypt.compare(oldPassword, user.password);
+
+        // Return an error if the previous password that is entered does not match what was saved:
         if (!match) return res.sendStatus(401);
 
         // Otherwise, encrypt the new password and save it:
@@ -79,8 +90,28 @@ router.put("/password", isAuthorized, async (req, res) => {
 
     // Send an interal server error 500 if the password change attempt failed for some other reason:
     catch (error) {
-        res.sendStatus(500).json;
+        res.sendStatus(500);
     }
 });
+
+
+/////////////////////////////////
+// DELETE a user - Admin only //
+///////////////////////////////
+router.delete("/:id", isAuthorized, isAdmin, async (req, res) => {
+    try {
+        const deleted = await userDao.deleteUser(req.params.id);
+
+        // If the user is not found, return a 404 error:
+        if (!deleted) return res.sendStatus(404);
+
+        // Otherwise, send confirmation that the user was deleted:
+        res.json({ message: "User deleted" });
+    } 
+    catch (err) {
+        res.sendStatus(500);
+    }
+  });
+
 
 module.exports = router;
