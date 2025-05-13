@@ -38,11 +38,17 @@ router.post("/signup", async (req, res) => {
 });
 
 
+
 ////////////
 // Login //
 //////////
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
+
+    // Check that both email and password have been provided.  If not, return a 400 error:
+    if (!email || !password || password.trim() === "") {
+        return res.status(400).json({ message: "Both email and password are required" });
+    }
 
     try {
 
