@@ -1,9 +1,9 @@
 // Import Mongoose:
 const mongoose = require("mongoose");
 
-///////////////////////////////////
-// Create a schema for an item: //
-/////////////////////////////////
+//////////////////////////////////////////
+// Define the schema used for an item: //
+////////////////////////////////////////
 const itemSchema = new mongoose.Schema({
 
   // A title must be provided for each item and any surrounding white space will be trimmed away:
