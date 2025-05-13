@@ -15,13 +15,13 @@ const jwt = require("jsonwebtoken");
 const isAuthorized = (req, res, next) => {
     const authorizationHeader = req.headers.authorization;      // Retrieves the value of the `Authorization` header from the incoming HTTP request.
 
-    // If the header is missing or does not start with the word `Bearer ` return a 401 error:
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.sendStatus(401);         // Not authorized because no token was provided
+    // If the header token is missing or does not start with the word `Bearer ` return a 401 error:
+    if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+        return res.sendStatus(401); // Not authorized because no token was provided
     }
 
     // Extract the token from the header by looking for what follows the space after the word "Bearer":
-    const token = authorizationHeader.split(' ')[1];
+    const token = authorizationHeader.split(" ")[1];
 
     // Attempt to verify and decode the token using the secret stored in the `.env` file (`JWT_SECRET`):
     try {
