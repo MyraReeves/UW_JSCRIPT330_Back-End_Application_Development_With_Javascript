@@ -67,7 +67,7 @@ describe("/auth", () => {
 
       it("should return 409 Conflict with a repeat signup", async () => {
         let res = await request(server).post("/auth/signup").send(user0);
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         res = await request(server).post("/auth/signup").send(user0);
         expect(res.statusCode).toEqual(409);
       });
