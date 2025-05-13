@@ -26,8 +26,15 @@ router.post("/signup", async (req, res) => {
         res.status(201).json({ message: "New user successfully created!" });
     }
     catch (error) {
-        res.sendStatus(400);
-    }
+        // "MongoDB/Mongoose uses error code 11000 when a unique constraint is violated — which is what happens if the email already exists."
+        if (error.code === 11000) {
+            // The auth.test file says instead that it "should return 409 Conflict with a repeat signup."
+            return res.status(409).json({ message: "Email already in use" });
+          }
+        
+        // A generic 400 error can be used for all other creation errors:
+          res.sendStatus(400);
+        }
 });
 
 
