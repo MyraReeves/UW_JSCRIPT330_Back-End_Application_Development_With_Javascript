@@ -14,6 +14,11 @@ const router = express.Router();
 router.post("/signup", async (req, res) => {
     const { email, password, roles = ["user"] } = req.body;
 
+    // Check first that the email and password aren't empty strings. If they are, then return a 400 Bad Request error:
+    if (!email || !password || password.trim() === ""){
+        return res.sendStatus(400)
+    }
+
     try {
         const hashed = await bcrypt.hash(password, 10);
         const user = await userDao.createUser({ email, password: hashed, roles });
@@ -34,16 +39,16 @@ router.post("/login", async (req, res) => {
 
     try {
 
-        // Find a user within the DB using their email address:
+        // Find a user within the database using their email address:
         const user = await userDao.findUserByEmail(email);
 
-        // Return an error if the user email address can't be found:
+        // Return an "Unauthorized" error if the user email address can't be found:
         if (!user) return res.sendStatus(401);
 
         // Compare the entered password with the one saved in the DB for that user:
         const match = await bcrypt.compare(password, user.password);
 
-        // Return an error if the password credentials don't match:
+        // Return an "Unauthorized" error if the password credentials don't match:
         if (!match) return res.sendStatus(401);
 
         // Otherwise, generate an encrypted JSON web token for the authenticated user:
@@ -79,7 +84,7 @@ router.put("/password", isAuthorized, async (req, res) => {
         // Compare the entered password with the one saved inside the DB
         const match = await bcrypt.compare(oldPassword, user.password);
 
-        // Return an error if the previous password that is entered does not match what was saved:
+        // Return an "Unauthorized" error if the previous password that is entered does not match what was saved:
         if (!match) return res.sendStatus(401);
 
         // Otherwise, encrypt the new password and save it:
