@@ -87,7 +87,13 @@ router.post("/login", async (req, res) => {
 router.put("/password", isAuthorized, async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
+    // Reject empty new passwords:
+    if (!newPassword || newPassword.trim() === ""){
+        return res.sendStatus(400);
+    }
+
     try {
+
         // Find the user by their id:
         const user = await userDao.findUserById(req.user._id);
 
