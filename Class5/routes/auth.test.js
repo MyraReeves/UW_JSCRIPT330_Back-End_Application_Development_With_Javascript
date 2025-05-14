@@ -1,8 +1,10 @@
 const request = require("supertest");
 var jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const server = require("../server");
 const testUtils = require("../test-utils");
 const User = require("../models/userModel");
+process.env.JWT_SECRET = "testsecret";
 
 
 describe("/auth", () => {
@@ -84,8 +86,12 @@ describe("/auth", () => {
 
   describe.each([user0, user1])("User %#", (user) => {
     beforeEach(async () => {
-      await request(server).post("/auth/signup").send(user0);
-      await request(server).post("/auth/signup").send(user1);
+      const hashed0 = await bcrypt.hash(user0.password, 10);
+      const hashed1 = await bcrypt.hash(user1.password, 10);
+      await User.create({ email: user0.email, password: hashed0, roles: ["user"]});
+      await User.create({email: user1.email, password: hashed1, roles: ["user"]});
+      // await request(server).post("/auth/signup").send(user0);
+      // await request(server).post("/auth/signup").send(user1);
     });
 
     describe("POST /", () => {
