@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
 
         // Otherwise, generate an encrypted JSON web token for the authenticated user:
         const token = jwt.sign(
-            { _id: user._id, roles: user.roles },
+            { _id: user._id, email: user.email, roles: user.roles },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
