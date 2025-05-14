@@ -173,7 +173,7 @@ describe("/auth", () => {
         const res = await request(server)
           .put("/auth/password")
           .set("Authorization", "Bearer " + token0)
-          .send({ password: "123" });
+          .send({ oldPassword: user0.password, newPassword: "123" });
         expect(res.statusCode).toEqual(200);
         let loginRes0 = await request(server).post("/auth/login").send(user0);
         expect(loginRes0.statusCode).toEqual(401);
@@ -190,7 +190,7 @@ describe("/auth", () => {
         const res = await request(server)
           .put("/auth/password")
           .set("Authorization", "Bearer " + token1)
-          .send({ password: "123" });
+          .send({ oldPassword: user1.password, newPassword: "123" });
         expect(res.statusCode).toEqual(200);
         const loginRes0 = await request(server).post("/auth/login").send(user0);
         expect(loginRes0.statusCode).toEqual(200);
