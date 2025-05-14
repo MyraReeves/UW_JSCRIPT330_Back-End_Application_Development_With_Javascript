@@ -3,6 +3,7 @@ const server = require("../server");
 const testUtils = require("../test-utils");
 const User = require("../models/userModel");
 const Item = require("../models/itemModel");
+process.env.JWT_SECRET = "testsecret";
 
 
 describe("/items", () => {
