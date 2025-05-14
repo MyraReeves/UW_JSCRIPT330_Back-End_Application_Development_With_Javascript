@@ -4,6 +4,7 @@ const testUtils = require("../test-utils");
 const User = require("../models/userModel");
 const Item = require("../models/itemModel");
 const Order = require("../models/orderModel");
+process.env.JWT_SECRET = "testsecret";
 
 
 describe("/order", () => {
@@ -98,8 +99,10 @@ describe("/order", () => {
         const res = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + token0)
-          .send(items.map((i) => i._id));
-        expect(res.statusCode).toEqual(200);
+          .send({ items: items.map((i) => i._id) });
+      
+        expect(res.statusCode).toEqual(201);
+      
         const storedOrder = await Order.findOne().lean();
         expect(storedOrder).toMatchObject({
           items: items.map((i) => i._id),
