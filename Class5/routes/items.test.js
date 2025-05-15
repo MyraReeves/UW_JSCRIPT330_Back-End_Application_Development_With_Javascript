@@ -98,12 +98,12 @@ describe("/items", () => {
         expect(await Item.countDocuments()).toEqual(0);
       });
 
-      it("should send 200 to admin user and store item", async () => {
+      it("should send 201 to admin user and store item", async () => {
         const res = await request(server)
           .post("/items")
           .set("Authorization", "Bearer " + adminToken)
           .send(item);
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         expect(res.body).toMatchObject(item);
         const savedItem = await Item.findOne({ _id: res.body._id }).lean();
         expect(savedItem).toMatchObject(item);
