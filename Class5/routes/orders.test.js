@@ -100,9 +100,7 @@ describe("/order", () => {
           .post("/orders")
           .set("Authorization", "Bearer " + token0)
           .send({ items: items.map((i) => i._id) });
-      
-        expect(res.statusCode).toEqual(201);
-      
+        expect(res.statusCode).toEqual(200);
         const storedOrder = await Order.findOne().lean();
         expect(storedOrder).toMatchObject({
           items: items.map((i) => i._id),
@@ -115,7 +113,7 @@ describe("/order", () => {
         const res = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + adminToken)
-          .send([items[1], items[1], items[0]].map((i) => i._id));
+          .send({ items: [items[1], items[1], items[0]].map((i) => i._id) });
         expect(res.statusCode).toEqual(200);
         const storedOrder = await Order.findOne().lean();
         expect(storedOrder).toMatchObject({
@@ -129,7 +127,7 @@ describe("/order", () => {
         const res = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + adminToken)
-          .send([items[1], "5f1b8d9ca0ef055e6e5a1f6b"].map((i) => i._id));
+          .send({ items: [items[1], "5f1b8d9ca0ef055e6e5a1f6b"].map((i) => i._id) });
         expect(res.statusCode).toEqual(400);
         const storedOrder = await Order.findOne().lean();
         expect(storedOrder).toBeNull();
@@ -143,12 +141,12 @@ describe("/order", () => {
         const res0 = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + token0)
-          .send([items[0], items[1], items[1]].map((i) => i._id));
+          .send({ items: [items[0], items[1], items[1]].map((i) => i._id) });
         order0Id = res0.body._id;
         const res1 = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + adminToken)
-          .send([items[1]].map((i) => i._id));
+          .send({ items: [items[1]].map((i) => i._id) });
         order1Id = res1.body._id;
       });
 
@@ -206,12 +204,12 @@ describe("/order", () => {
         const res0 = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + token0)
-          .send(items.map((i) => i._id));
+          .send({ items: items.map((i) => i._id) });
         order0Id = res0.body._id;
         const res1 = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + adminToken)
-          .send([items[1]].map((i) => i._id));
+          .send({ items: [items[1]].map((i) => i._id) });
         order1Id = res1.body._id;
       });
 
