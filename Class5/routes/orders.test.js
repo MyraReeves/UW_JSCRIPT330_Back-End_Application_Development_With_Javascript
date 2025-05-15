@@ -95,12 +95,12 @@ describe("/order", () => {
     });
 
     describe("POST /", () => {
-      it("should send 200 to normal user and create order", async () => {
+      it("should send 201 to normal user and create order", async () => {
         const res = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + token0)
           .send({ items: items.map((i) => i._id) });
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         const storedOrder = await Order.findOne().lean();
         expect(storedOrder).toMatchObject({
           items: items.map((i) => i._id),
@@ -109,12 +109,12 @@ describe("/order", () => {
         });
       });
 
-      it("should send 200 to admin user and create order with repeat items", async () => {
+      it("should send 201 to admin user and create order with repeat items", async () => {
         const res = await request(server)
           .post("/orders")
           .set("Authorization", "Bearer " + adminToken)
           .send({ items: [items[1], items[1], items[0]].map((i) => i._id) });
-        expect(res.statusCode).toEqual(200);
+        expect(res.statusCode).toEqual(201);
         const storedOrder = await Order.findOne().lean();
         expect(storedOrder).toMatchObject({
           items: [items[1]._id, items[1]._id, items[0]._id],
