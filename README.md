@@ -13,3 +13,15 @@ Below are my school assignments from the 2025 Spring quarter of the University o
 * [Assignment 2 - Intro to MongoDB](./Class2/README.md)
 
 * [Assignment 1 - Intro to Express](./Class1/README.md)
+
+## Commands Used When Setting Up an Express API
+
+* `npm init -y` = Initializes the project
+
+* `npm install` = Installs npm dependencies
+
+* `npm install express mongoose dotenv` = Installs core dependencies of Express, Mongoose, and dotenv
+
+* `npm install bcryptjs jsonwebtoken` = Installs authentication dependencies
+
+* `npm install --save-dev nodemon` = Enables nodemon to refresh live feed without needing to close and reopen it
