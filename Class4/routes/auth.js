@@ -95,7 +95,7 @@ router.post('/login', async (req, res) => {
         }, process.env.JWT_SECRET, {expiresIn: '30m'} );
     
         // Then return the token to the client:
-        return res.sendStatus(200).send({token});
+        return res.status(200).send({ token });
     }
     catch (error){
         return res.sendStatus(500)
