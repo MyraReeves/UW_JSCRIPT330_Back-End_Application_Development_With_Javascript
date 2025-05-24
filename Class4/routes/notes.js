@@ -71,7 +71,7 @@ router.get('/:id', async (req, res) => {
 
     // Validate that the note's id is valid:
     if (!mongoose.isValidObjectId(id)) {
-        return res.status(400);
+        return res.sendStatus(400);
     }
 
     // Get the note by using the note id and the userId:
